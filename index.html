@@ -10,17 +10,14 @@ body {
   font-family: Arial;
   background:#0f172a;
   color:white;
-  overflow-x:hidden;
 }
 
 .container {
-  max-width:700px;
+  max-width:800px;
   margin:auto;
   padding:30px;
   text-align:center;
 }
-
-.hidden {display:none;}
 
 button {
   padding:12px 20px;
@@ -34,18 +31,7 @@ button {
 
 button:hover {background:#0ea5e9;}
 
-.progress {
-  height:6px;
-  background:#1e293b;
-  margin-bottom:20px;
-}
-
-.bar {
-  height:6px;
-  background:#38bdf8;
-  width:0%;
-  transition:0.3s;
-}
+.hidden {display:none;}
 
 .card {
   background:#1e293b;
@@ -54,18 +40,21 @@ button:hover {background:#0ea5e9;}
   border-radius:12px;
 }
 
-img {
-  width:100%;
-  border-radius:10px;
+input {
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:60%;
 }
 
-.fade {
-  animation:fade 0.4s;
+.cta {
+  background:#22c55e;
+  color:black;
 }
 
-@keyframes fade {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
+.tag {
+  font-size:12px;
+  opacity:0.7;
 }
 </style>
 </head>
@@ -76,38 +65,40 @@ img {
 
 <h1>Find Your Perfect Holiday ✈️</h1>
 
-<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="quiz">
+<p>Weather?</p>
+<button onclick="answer('hot')">Hot</button>
+<button onclick="answer('cold')">Cold</button>
 
-<div id="q1" class="fade">
-<h2>What weather do you prefer?</h2>
-<button onclick="next('hot')">Hot ☀️</button>
-<button onclick="next('cold')">Cold ❄️</button>
+<p>Trip type?</p>
+<button onclick="answer('relax')">Relax</button>
+<button onclick="answer('adventure')">Adventure</button>
+<button onclick="answer('city')">City</button>
+
+<p>Budget?</p>
+<button onclick="answer('low')">Low</button>
+<button onclick="answer('high')">Luxury</button>
+
+<br><br>
+<button onclick="getResult()">Find My Trip</button>
 </div>
 
-<div id="q2" class="hidden fade">
-<h2>What type of trip?</h2>
-<button onclick="next('relax')">Relax 🏖️</button>
-<button onclick="next('adventure')">Adventure 🏔️</button>
-<button onclick="next('city')">City 🏙️</button>
-</div>
-
-<div id="q3" class="hidden fade">
-<h2>What’s your budget?</h2>
-<button onclick="finish('low')">Low 💸</button>
-<button onclick="finish('high')">Luxury 💎</button>
-</div>
-
-<div id="result" class="hidden fade">
+<div id="result" class="hidden">
 <h1 id="title"></h1>
-<img id="img">
 <p id="desc"></p>
-
-<h3>Why this matches you</h3>
 <p id="why"></p>
+
+<p style="color:#22c55e;">🔥 Popular choice right now</p>
 
 <h2>Top Hotels</h2>
 <div id="hotels"></div>
 
+<h3>Get a full travel plan ✈️</h3>
+<input id="email" placeholder="Enter your email">
+<br>
+<button class="cta" onclick="captureEmail()">Send My Plan</button>
+
+<br><br>
 <button onclick="restart()">Start Again</button>
 </div>
 
@@ -116,114 +107,120 @@ img {
 <script>
 
 let answers=[];
-let step=1;
 
-function updateBar(){
-  document.getElementById("bar").style.width=(step*33)+"%";
-}
-
-function next(a){
+function answer(a){
   answers.push(a);
-  document.getElementById("q"+step).classList.add("hidden");
-  step++;
-  document.getElementById("q"+step).classList.remove("hidden");
-  updateBar();
-}
-
-function finish(a){
-  answers.push(a);
-  document.getElementById("q3").classList.add("hidden");
-  showResult();
 }
 
 const data={
   bali:{
-    img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-    desc:"A tropical paradise for pure relaxation.",
-    why:"You chose warm weather and relaxation — Bali is perfect.",
+    desc:"Relax in a tropical paradise.",
+    why:"Perfect for your warm + relaxation preferences.",
     hotels:[
-      {n:"Four Seasons Bali", t:"Luxury 💎", l:"Ubud", link:"https://www.fourseasons.com"},
-      {n:"Bulgari Resort", t:"Luxury 💎", l:"Uluwatu", link:"https://www.bulgarihotels.com"},
-      {n:"Ayodya Resort", t:"Mid-range", l:"Nusa Dua", link:"https://www.ayodyaresortbali.com"}
+      {n:"Four Seasons Bali",tag:"Luxury 💎",link:"#"},
+      {n:"Bulgari Resort",tag:"Luxury 💎",link:"#"},
+      {n:"Ayodya Resort",tag:"Mid-range",link:"#"},
+      {n:"Kuta Beach Hotel",tag:"Budget",link:"#"}
     ]
   },
 
   paris:{
-    img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
-    desc:"Romantic, cultural and iconic.",
-    why:"You prefer culture and cooler vibes — Paris fits perfectly.",
+    desc:"Romantic and cultural escape.",
+    why:"Ideal for city lovers and cooler climates.",
     hotels:[
-      {n:"Ritz Paris", t:"Luxury 💎", l:"Central", link:"https://www.ritzparis.com"},
-      {n:"Hotel Regina", t:"Premium", l:"Louvre", link:"https://www.regina-hotel.com"},
-      {n:"Ibis Paris", t:"Budget", l:"Various", link:"https://all.accor.com"}
+      {n:"Ritz Paris",tag:"Luxury 💎",link:"#"},
+      {n:"Hotel Regina",tag:"Premium",link:"#"},
+      {n:"Ibis Paris",tag:"Budget",link:"#"}
     ]
   },
 
   dubai:{
-    img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
-    desc:"Luxury, shopping and adventure.",
-    why:"You like excitement and luxury — Dubai delivers both.",
+    desc:"Luxury and adventure combined.",
+    why:"Matches your high-energy + luxury vibe.",
     hotels:[
-      {n:"Atlantis The Palm", t:"Luxury 💎", l:"Palm", link:"https://www.atlantis.com"},
-      {n:"Burj Al Arab", t:"Ultra Luxury", l:"Jumeirah", link:"https://www.jumeirah.com"},
-      {n:"Rove Downtown", t:"Budget", l:"Downtown", link:"https://www.rovehotels.com"}
+      {n:"Atlantis The Palm",tag:"Luxury 💎",link:"#"},
+      {n:"Burj Al Arab",tag:"Ultra Luxury",link:"#"},
+      {n:"Rove Downtown",tag:"Budget",link:"#"}
     ]
   },
 
   barcelona:{
-    img:"https://images.unsplash.com/photo-1505761671935-60b3a7427bad",
-    desc:"A vibrant mix of beach and city life.",
-    why:"You like balance — culture + relaxation — Barcelona is ideal.",
+    desc:"Beach meets city life.",
+    why:"Balanced lifestyle destination.",
     hotels:[
-      {n:"W Barcelona", t:"Luxury", l:"Beach", link:"https://www.marriott.com"},
-      {n:"Hotel Arts", t:"Premium", l:"City", link:"https://www.hotelartsbarcelona.com"},
-      {n:"Generator Hostel", t:"Budget", l:"Centre", link:"https://generatorhostels.com"}
+      {n:"W Barcelona",tag:"Luxury",link:"#"},
+      {n:"Hotel Arts",tag:"Premium",link:"#"},
+      {n:"Generator Hostel",tag:"Budget",link:"#"}
+    ]
+  },
+
+  tokyo:{
+    desc:"Futuristic city experience.",
+    why:"Perfect for exploring something new.",
+    hotels:[
+      {n:"Park Hyatt Tokyo",tag:"Luxury",link:"#"},
+      {n:"Shibuya Excel Hotel",tag:"Mid-range",link:"#"},
+      {n:"Capsule Hotel",tag:"Budget",link:"#"}
+    ]
+  },
+
+  rome:{
+    desc:"Historic and cultural journey.",
+    why:"Great for history and food lovers.",
+    hotels:[
+      {n:"Hotel Eden",tag:"Luxury",link:"#"},
+      {n:"NH Collection Roma",tag:"Mid-range",link:"#"},
+      {n:"Budget Inn Rome",tag:"Budget",link:"#"}
     ]
   }
 };
 
-function showResult(){
+function getResult(){
 
-  let score={bali:0,paris:0,dubai:0,barcelona:0};
+  let score={bali:0,paris:0,dubai:0,barcelona:0,tokyo:0,rome:0};
 
   answers.forEach(a=>{
     if(a==="hot"){score.bali+=2;score.dubai+=2;}
     if(a==="cold"){score.paris+=2;}
     if(a==="relax"){score.bali+=3;}
-    if(a==="adventure"){score.dubai+=3;}
-    if(a==="city"){score.paris+=2;score.barcelona+=2;}
-    if(a==="low"){score.barcelona+=2;}
+    if(a==="adventure"){score.dubai+=3;score.tokyo+=2;}
+    if(a==="city"){score.paris+=2;score.barcelona+=2;score.tokyo+=2;score.rome+=2;}
+    if(a==="low"){score.barcelona+=2;score.rome+=2;}
     if(a==="high"){score.dubai+=2;}
   });
 
   let dest=Object.keys(score).reduce((a,b)=>score[a]>score[b]?a:b);
 
+  document.getElementById("quiz").classList.add("hidden");
   document.getElementById("result").classList.remove("hidden");
 
   document.getElementById("title").innerText=dest.toUpperCase();
   document.getElementById("desc").innerText=data[dest].desc;
   document.getElementById("why").innerText=data[dest].why;
-  document.getElementById("img").src=data[dest].img;
 
   let html="";
   data[dest].hotels.forEach(h=>{
     html+=`
     <div class="card">
       <h3>${h.n}</h3>
-      <p>${h.t}</p>
-      <p>📍 ${h.l}</p>
-      <a href="${h.link}" target="_blank">View Hotel</a>
+      <p class="tag">${h.tag}</p>
+      <button class="cta">Book Best Price</button>
     </div>`;
   });
 
   document.getElementById("hotels").innerHTML=html;
 }
 
+function captureEmail(){
+  let email=document.getElementById("email").value;
+  if(email){
+    alert("Travel plan sent to "+email);
+  }
+}
+
 function restart(){
   location.reload();
 }
-
-updateBar();
 
 </script>
 
