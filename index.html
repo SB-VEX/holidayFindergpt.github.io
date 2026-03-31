@@ -24,12 +24,19 @@ button {
   margin:10px;
   border:none;
   border-radius:12px;
-  background:#38bdf8;
+  background:#1e293b;
+  color:white;
   cursor:pointer;
-  font-size:16px;
 }
 
-button:hover {background:#0ea5e9;}
+button.selected {
+  background:#38bdf8;
+  color:black;
+}
+
+button:hover {
+  background:#0ea5e9;
+}
 
 .hidden {display:none;}
 
@@ -40,11 +47,10 @@ button:hover {background:#0ea5e9;}
   border-radius:12px;
 }
 
-input {
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  width:60%;
+img {
+  width:100%;
+  border-radius:12px;
+  margin-top:10px;
 }
 
 .cta {
@@ -52,9 +58,15 @@ input {
   color:black;
 }
 
-.tag {
-  font-size:12px;
-  opacity:0.7;
+input {
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:60%;
+}
+
+.price {
+  color:#22c55e;
 }
 </style>
 </head>
@@ -66,126 +78,109 @@ input {
 <h1>Find Your Perfect Holiday ✈️</h1>
 
 <div id="quiz">
+
 <p>Weather?</p>
-<button onclick="answer('hot')">Hot</button>
-<button onclick="answer('cold')">Cold</button>
+<button onclick="select(this,'hot')">Hot ☀️</button>
+<button onclick="select(this,'cold')">Cold ❄️</button>
 
 <p>Trip type?</p>
-<button onclick="answer('relax')">Relax</button>
-<button onclick="answer('adventure')">Adventure</button>
-<button onclick="answer('city')">City</button>
+<button onclick="select(this,'relax')">Relax 🏖️</button>
+<button onclick="select(this,'adventure')">Adventure 🏔️</button>
+<button onclick="select(this,'city')">City 🏙️</button>
 
 <p>Budget?</p>
-<button onclick="answer('low')">Low</button>
-<button onclick="answer('high')">Luxury</button>
+<button onclick="select(this,'low')">Low 💸</button>
+<button onclick="select(this,'high')">Luxury 💎</button>
 
 <br><br>
 <button onclick="getResult()">Find My Trip</button>
+
 </div>
 
 <div id="result" class="hidden">
+
 <h1 id="title"></h1>
+<img id="image">
 <p id="desc"></p>
 <p id="why"></p>
+
+<p class="price" id="price"></p>
 
 <p style="color:#22c55e;">🔥 Popular choice right now</p>
 
 <h2>Top Hotels</h2>
 <div id="hotels"></div>
 
-<h3>Get a full travel plan ✈️</h3>
+<h3>Get your personalised 5-day travel plan ✈️</h3>
 <input id="email" placeholder="Enter your email">
 <br>
 <button class="cta" onclick="captureEmail()">Send My Plan</button>
 
 <br><br>
 <button onclick="restart()">Start Again</button>
+
 </div>
 
 </div>
 
 <script>
 
-let answers=[];
+let answers = [];
 
-function answer(a){
-  answers.push(a);
+function select(btn, value){
+  btn.classList.toggle("selected");
+  answers.push(value);
 }
 
-const data={
+const data = {
+
   bali:{
+    img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
     desc:"Relax in a tropical paradise.",
     why:"Perfect for your warm + relaxation preferences.",
+    price:"Trips from £600",
     hotels:[
-      {n:"Four Seasons Bali",tag:"Luxury 💎",link:"#"},
-      {n:"Bulgari Resort",tag:"Luxury 💎",link:"#"},
-      {n:"Ayodya Resort",tag:"Mid-range",link:"#"},
-      {n:"Kuta Beach Hotel",tag:"Budget",link:"#"}
-    ]
-  },
-
-  paris:{
-    desc:"Romantic and cultural escape.",
-    why:"Ideal for city lovers and cooler climates.",
-    hotels:[
-      {n:"Ritz Paris",tag:"Luxury 💎",link:"#"},
-      {n:"Hotel Regina",tag:"Premium",link:"#"},
-      {n:"Ibis Paris",tag:"Budget",link:"#"}
+      {n:"Four Seasons Bali", link:"https://www.booking.com"},
+      {n:"Bulgari Resort", link:"https://www.booking.com"},
+      {n:"Ayodya Resort", link:"https://www.booking.com"}
     ]
   },
 
   dubai:{
+    img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
     desc:"Luxury and adventure combined.",
     why:"Matches your high-energy + luxury vibe.",
+    price:"Trips from £800",
     hotels:[
-      {n:"Atlantis The Palm",tag:"Luxury 💎",link:"#"},
-      {n:"Burj Al Arab",tag:"Ultra Luxury",link:"#"},
-      {n:"Rove Downtown",tag:"Budget",link:"#"}
+      {n:"Atlantis The Palm", link:"https://www.booking.com"},
+      {n:"Burj Al Arab", link:"https://www.booking.com"},
+      {n:"Rove Downtown", link:"https://www.booking.com"}
     ]
   },
 
-  barcelona:{
-    desc:"Beach meets city life.",
-    why:"Balanced lifestyle destination.",
+  paris:{
+    img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+    desc:"Romantic cultural escape.",
+    why:"Ideal for city lovers.",
+    price:"Trips from £500",
     hotels:[
-      {n:"W Barcelona",tag:"Luxury",link:"#"},
-      {n:"Hotel Arts",tag:"Premium",link:"#"},
-      {n:"Generator Hostel",tag:"Budget",link:"#"}
-    ]
-  },
-
-  tokyo:{
-    desc:"Futuristic city experience.",
-    why:"Perfect for exploring something new.",
-    hotels:[
-      {n:"Park Hyatt Tokyo",tag:"Luxury",link:"#"},
-      {n:"Shibuya Excel Hotel",tag:"Mid-range",link:"#"},
-      {n:"Capsule Hotel",tag:"Budget",link:"#"}
-    ]
-  },
-
-  rome:{
-    desc:"Historic and cultural journey.",
-    why:"Great for history and food lovers.",
-    hotels:[
-      {n:"Hotel Eden",tag:"Luxury",link:"#"},
-      {n:"NH Collection Roma",tag:"Mid-range",link:"#"},
-      {n:"Budget Inn Rome",tag:"Budget",link:"#"}
+      {n:"Ritz Paris", link:"https://www.booking.com"},
+      {n:"Hotel Regina", link:"https://www.booking.com"}
     ]
   }
+
 };
 
 function getResult(){
 
-  let score={bali:0,paris:0,dubai:0,barcelona:0,tokyo:0,rome:0};
+  let score={bali:0,dubai:0,paris:0};
 
   answers.forEach(a=>{
     if(a==="hot"){score.bali+=2;score.dubai+=2;}
     if(a==="cold"){score.paris+=2;}
     if(a==="relax"){score.bali+=3;}
-    if(a==="adventure"){score.dubai+=3;score.tokyo+=2;}
-    if(a==="city"){score.paris+=2;score.barcelona+=2;score.tokyo+=2;score.rome+=2;}
-    if(a==="low"){score.barcelona+=2;score.rome+=2;}
+    if(a==="adventure"){score.dubai+=3;}
+    if(a==="city"){score.paris+=2;}
     if(a==="high"){score.dubai+=2;}
   });
 
@@ -197,14 +192,15 @@ function getResult(){
   document.getElementById("title").innerText=dest.toUpperCase();
   document.getElementById("desc").innerText=data[dest].desc;
   document.getElementById("why").innerText=data[dest].why;
+  document.getElementById("price").innerText=data[dest].price;
+  document.getElementById("image").src=data[dest].img;
 
   let html="";
   data[dest].hotels.forEach(h=>{
     html+=`
     <div class="card">
       <h3>${h.n}</h3>
-      <p class="tag">${h.tag}</p>
-      <button class="cta">Book Best Price</button>
+      <button class="cta" onclick="window.open('${h.link}')">Book Best Price</button>
     </div>`;
   });
 
@@ -214,7 +210,7 @@ function getResult(){
 function captureEmail(){
   let email=document.getElementById("email").value;
   if(email){
-    alert("Travel plan sent to "+email);
+    alert("Your personalised plan is on its way to "+email);
   }
 }
 
