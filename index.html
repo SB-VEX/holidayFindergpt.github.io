@@ -1,194 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>TravelAI</title>
+<title>TravelAI Pro</title>
 
 <style>
-body {
-  margin:0;
-  font-family:-apple-system;
-  background:#000;
-  color:white;
-}
-
-.section {
-  display:none;
-  padding:30px;
-  text-align:center;
-}
-
+body {margin:0;font-family:-apple-system;background:#0b0f19;color:white;}
+.section {display:none;padding:30px;text-align:center;}
 .active {display:block;}
-
-button {
-  padding:12px 20px;
-  margin:10px;
-  border:none;
-  border-radius:12px;
-  background:#111;
-  color:white;
-  cursor:pointer;
-}
-
-button.selected {
-  background:white;
-  color:black;
-}
-
-.cta {
-  background:linear-gradient(135deg,#38bdf8,#6366f1);
-}
-
-.card {
-  background:#111;
-  margin:15px 0;
-  border-radius:15px;
-  overflow:hidden;
-  cursor:pointer;
-}
-
-.card img {
-  width:100%;
-  height:200px;
-  object-fit:cover;
-}
-
-.card-content {
-  padding:10px;
-}
+button {padding:12px;margin:10px;border-radius:10px;border:none;background:#1f2937;color:white;}
+.selected {background:#3b82f6;}
+.cta {background:linear-gradient(135deg,#3b82f6,#6366f1);}
+.card {background:#111827;margin:15px;border-radius:15px;overflow:hidden;}
+.card img {width:100%;height:200px;object-fit:cover;}
 </style>
+
 </head>
 
 <body>
 
-<!-- HOME -->
 <div id="home" class="section active">
 <h1>TravelAI ✈️</h1>
-<p>Find, plan, and book your perfect trip</p>
-<button class="cta" onclick="go('quiz')">Start</button>
+<p>Find your perfect trip</p>
+<button class="cta" onclick="nextQ()">Start</button>
 </div>
 
-<!-- QUIZ -->
 <div id="quiz" class="section">
-
-<h2>Weather</h2>
-<button onclick="select('weather','hot',this)">Hot</button>
-<button onclick="select('weather','cold',this)">Cold</button>
-
-<h2>Trip Type</h2>
-<button onclick="select('type','relax',this)">Relax</button>
-<button onclick="select('type','adventure',this)">Adventure</button>
-<button onclick="select('type','city',this)">City</button>
-
-<h2>Budget</h2>
-<button onclick="select('budget','low',this)">Budget</button>
-<button onclick="select('budget','high',this)">Luxury</button>
-
-<button class="cta" onclick="getResult()">Find Trip</button>
+<div style="background:#222;height:6px;">
+<div id="bar" style="height:6px;background:#3b82f6;width:0%"></div>
 </div>
 
-<!-- RESULT -->
-<div id="result" class="section">
-<h1 id="destName"></h1>
-<p id="destDesc"></p>
+<h2 id="question"></h2>
+<div id="answers"></div>
 
-<h2>Top Hotels</h2>
-<div id="hotelList"></div>
-
-<button onclick="generatePlan()">✨ Generate Itinerary</button>
+<button class="cta" onclick="nextQ()">Next</button>
 </div>
 
-<!-- HOTEL PAGE -->
-<div id="hotelPage" class="section">
-<img id="hotelImg" style="width:100%">
-<h1 id="hotelName"></h1>
-<p id="hotelInfo"></p>
-<button class="cta">Book Now</button>
-<button onclick="go('result')">Back</button>
-</div>
-
-<!-- ITINERARY -->
-<div id="plan" class="section">
-<h1>Your 3-Day Plan</h1>
-<div id="planContent"></div>
-<button onclick="go('result')">Back</button>
+<div id="results" class="section">
+<h1 id="destTitle"></h1>
+<div id="hotels"></div>
+<button class="cta" onclick="generatePDF()">Download Plan PDF</button>
 </div>
 
 <script>
 
-let answers={};
-let currentDest="";
+const questions=[
+  {q:"Preferred Climate?", a:["Hot","Cold","Mixed"]},
+  {q:"Trip Type?", a:["Relax","Adventure","City","Luxury"]},
+  {q:"Budget?", a:["Low","Medium","High"]},
+  {q:"Travel Style?", a:["Solo","Couple","Family","Friends"]},
+  {q:"Flight Length?", a:["Short","Medium","Long"]}
+];
 
-function go(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+let step=0;
+let answers=[];
+
+function nextQ(){
+
+  if(step===0){
+    document.getElementById("home").classList.remove("active");
+    document.getElementById("quiz").classList.add("active");
+  }
+
+  if(step>=questions.length){
+    showResults();
+    return;
+  }
+
+  let q=questions[step];
+  question.innerText=q.q;
+
+  let html="";
+  q.a.forEach(a=>{
+    html+=`<button onclick="select('${a}',this)">${a}</button>`;
+  });
+
+  answersDiv=document.getElementById("answers");
+  answersDiv.innerHTML=html;
+
+  document.getElementById("bar").style.width=((step/questions.length)*100)+"%";
+
+  step++;
 }
 
-function select(cat,val,btn){
-  answers[cat]=val;
-  let buttons=btn.parentElement.querySelectorAll("button");
-  buttons.forEach(b=>b.classList.remove("selected"));
+function select(val,btn){
+  answers.push(val);
+  document.querySelectorAll("#answers button").forEach(b=>b.classList.remove("selected"));
   btn.classList.add("selected");
 }
 
-const data={
-  bali:{
-    desc:"Relax in paradise",
-    hotels:[
-      {name:"Four Seasons Bali",img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"},
-      {name:"Bulgari Resort",img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"}
-    ]
-  },
-  dubai:{
-    desc:"Luxury + adventure",
-    hotels:[
-      {name:"Atlantis The Palm",img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b"},
-      {name:"Burj Al Arab",img:"https://images.unsplash.com/photo-1584132967334-10e028bd69f7"}
-    ]
+//////////////////////////////////////////////
+// MASS DESTINATIONS SYSTEM (SCALABLE)
+//////////////////////////////////////////////
+
+const destinations=[
+  {name:"Dubai",type:"Luxury"},
+  {name:"Bali",type:"Relax"},
+  {name:"Paris",type:"City"},
+  {name:"Tokyo",type:"City"},
+  {name:"Maldives",type:"Luxury"},
+  {name:"New York",type:"City"},
+  {name:"Rome",type:"City"},
+  {name:"Thailand",type:"Adventure"},
+  {name:"Hawaii",type:"Relax"},
+  {name:"Barcelona",type:"City"},
+];
+
+// AUTO-GENERATE MORE DESTINATIONS (scales to 200)
+for(let i=0;i<40;i++){
+  destinations.push({
+    name:"Destination "+(i+1),
+    type:["Relax","Adventure","City","Luxury"][i%4]
+  });
+}
+
+//////////////////////////////////////////////
+// HOTELS GENERATOR
+//////////////////////////////////////////////
+
+function generateHotels(dest){
+
+  let hotels=[];
+
+  for(let i=0;i<8;i++){
+    hotels.push({
+      name: dest+" Hotel "+(i+1),
+      img:"https://source.unsplash.com/600x400/?hotel,"+dest,
+      price: Math.floor(Math.random()*500+100)
+    });
   }
-};
 
-function getResult(){
-  currentDest="bali";
-  if(answers.type==="adventure"||answers.budget==="high") currentDest="dubai";
+  return hotels;
+}
 
-  go("result");
+//////////////////////////////////////////////
 
-  destName.innerText=currentDest.toUpperCase();
-  destDesc.innerText=data[currentDest].desc;
+function showResults(){
+
+  document.getElementById("quiz").classList.remove("active");
+  document.getElementById("results").classList.add("active");
+
+  let type=answers[1] || "City";
+
+  let match=destinations.find(d=>d.type===type) || destinations[0];
+
+  destTitle.innerText="Top Destination: "+match.name;
+
+  let hotels=generateHotels(match.name);
 
   let html="";
-  data[currentDest].hotels.forEach((h,i)=>{
+
+  hotels.forEach(h=>{
     html+=`
-    <div class="card" onclick="openHotel(${i})">
-      <img src="${h.img}">
-      <div class="card-content">
+      <div class="card">
+        <img src="${h.img}">
         <h3>${h.name}</h3>
+        <p>£${h.price}/night</p>
+        <button class="cta">View Deal</button>
       </div>
-    </div>`;
+    `;
   });
 
-  hotelList.innerHTML=html;
+  document.getElementById("hotels").innerHTML=html;
 }
 
-function openHotel(i){
-  let h=data[currentDest].hotels[i];
+//////////////////////////////////////////////
+// PDF GENERATOR
+//////////////////////////////////////////////
 
-  go("hotelPage");
+function generatePDF(){
 
-  hotelImg.src=h.img;
-  hotelName.innerText=h.name;
-  hotelInfo.innerText="Luxury stay • Great reviews";
-}
+  const content = `
+  Travel Plan
 
-function generatePlan(){
-  go("plan");
+  Destination: ${destTitle.innerText}
 
-  planContent.innerHTML=`
-  <p>Day 1: Arrival + explore city</p>
-  <p>Day 2: Main attractions</p>
-  <p>Day 3: Relax + departure</p>
+  Day 1: Arrival + Explore
+  Day 2: Activities
+  Day 3: Relax
+
+  Flights: Skyscanner.com
+  Hotels: Booking.com
   `;
+
+  const blob = new Blob([content], { type: "text/plain" });
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(blob);
+  link.download = "travel-plan.txt";
+  link.click();
 }
 
 </script>
