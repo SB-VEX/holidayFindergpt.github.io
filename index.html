@@ -5,88 +5,49 @@
 <title>Holiday Finder</title>
 
 <style>
-* {margin:0; padding:0; box-sizing:border-box;}
 body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #000;
-  color: white;
-}
-
-/* HERO */
-.hero {
-  height:100vh;
-  background:url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e") center/cover;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-}
-
-.hero h1 {
-  font-size:48px;
-  font-weight:600;
-}
-
-.hero p {
-  margin-top:10px;
-  opacity:0.8;
-}
-
-.hero button {
-  margin-top:20px;
-  padding:15px 30px;
-  border:none;
-  border-radius:30px;
-  background:white;
-  color:black;
-  font-size:16px;
-  cursor:pointer;
-}
-
-/* GLASS CARD */
-.glass {
-  backdrop-filter: blur(20px);
-  background: rgba(255,255,255,0.1);
-  border-radius:20px;
-  padding:30px;
-  max-width:600px;
-  margin:auto;
-}
-
-/* QUIZ */
-.quiz {
-  display:none;
-  padding:60px 20px;
-  text-align:center;
-}
-
-button.option {
-  display:block;
-  width:100%;
-  margin:10px 0;
-  padding:15px;
-  border-radius:12px;
-  border:none;
-  background: rgba(255,255,255,0.1);
+  margin:0;
+  font-family:-apple-system;
+  background:#000;
   color:white;
-  cursor:pointer;
 }
 
-button.option.selected {
-  background:white;
-  color:black;
-}
-
-/* RESULT */
-.result {
-  display:none;
+.center {
+  text-align:center;
   padding:40px 20px;
 }
 
-.dest-img {
+button {
+  display:block;
+  width:100%;
+  max-width:400px;
+  margin:10px auto;
+  padding:15px;
+  border-radius:12px;
+  border:none;
+  background:#111;
+  color:white;
+  cursor:pointer;
+  font-size:16px;
+}
+
+button.selected {
+  background:white;
+  color:black;
+}
+
+.cta {
+  background:linear-gradient(135deg,#38bdf8,#6366f1);
+  color:white;
+  font-size:18px;
+  padding:18px;
+  border-radius:30px;
+}
+
+img {
   width:100%;
   border-radius:20px;
+  margin-top:20px;
 }
 
 .hotel {
@@ -106,119 +67,124 @@ button.option.selected {
   padding:10px;
 }
 
-.hotel-info h3 {
-  font-size:16px;
-}
-
-.hotel-info p {
-  font-size:13px;
-  opacity:0.7;
-}
-
-.hotel-info button {
-  margin-top:5px;
-  padding:8px 12px;
-  border:none;
-  border-radius:10px;
-  background:white;
-  color:black;
-  cursor:pointer;
-}
+.hidden {display:none;}
 </style>
 </head>
 
 <body>
 
-<!-- HERO -->
-<div class="hero" id="hero">
-  <h1>Find your perfect holiday</h1>
-  <p>Personalised in 30 seconds</p>
-  <button onclick="start()">Start</button>
+<div class="center" id="quiz">
+
+<h2>Step 1: Weather</h2>
+<button onclick="select('weather','hot',this)">Hot ☀️</button>
+<button onclick="select('weather','cold',this)">Cold ❄️</button>
+
+<h2>Step 2: Trip Type</h2>
+<button onclick="select('type','relax',this)">Relax 🏖️</button>
+<button onclick="select('type','adventure',this)">Adventure 🏔️</button>
+<button onclick="select('type','city',this)">City 🏙️</button>
+
+<h2>Step 3: Budget</h2>
+<button onclick="select('budget','low',this)">Budget 💸</button>
+<button onclick="select('budget','high',this)">Luxury 💎</button>
+
+<button class="cta" onclick="getResult()">✨ Find My Perfect Trip</button>
+
 </div>
 
-<!-- QUIZ -->
-<div class="quiz" id="quiz">
-  <div class="glass">
-    <h2>Choose your vibe</h2>
+<div class="center hidden" id="result">
+<img id="img">
+<h1 id="title"></h1>
+<p id="desc"></p>
 
-    <button class="option" onclick="select(this,'hot')">Hot ☀️</button>
-    <button class="option" onclick="select(this,'cold')">Cold ❄️</button>
+<h2>Top stays</h2>
+<div id="hotels"></div>
 
-    <button class="option" onclick="select(this,'relax')">Relax 🏖️</button>
-    <button class="option" onclick="select(this,'adventure')">Adventure 🏔️</button>
-    <button class="option" onclick="select(this,'city')">City 🏙️</button>
-
-    <button class="option" onclick="select(this,'low')">Budget 💸</button>
-    <button class="option" onclick="select(this,'high')">Luxury 💎</button>
-
-    <button onclick="result()">Find my trip</button>
-  </div>
-</div>
-
-<!-- RESULT -->
-<div class="result" id="result">
-  <img id="destImg" class="dest-img">
-  <h1 id="destName"></h1>
-  <p id="destDesc"></p>
-
-  <h2>Top stays</h2>
-  <div id="hotels"></div>
+<button onclick="location.reload()">Start again</button>
 </div>
 
 <script>
 
-let answers=[];
+let answers={
+  weather:null,
+  type:null,
+  budget:null
+};
 
-function start(){
-  document.getElementById("hero").style.display="none";
-  document.getElementById("quiz").style.display="block";
-}
+function select(category,value,btn){
 
-function select(btn,val){
-  btn.classList.toggle("selected");
-  answers.push(val);
+  answers[category]=value;
+
+  let buttons=btn.parentElement.querySelectorAll("button");
+  buttons.forEach(b=>b.classList.remove("selected"));
+
+  btn.classList.add("selected");
 }
 
 const data={
   bali:{
     img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-    desc:"Tropical paradise perfect for relaxation",
+    desc:"Perfect for relaxing tropical escapes.",
     hotels:[
-      {name:"Four Seasons Bali",img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"},
-      {name:"Bulgari Resort",img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"}
+      "Four Seasons Bali","Bulgari Resort","Ayodya Resort",
+      "Alila Villas","The Legian Bali","Padma Resort",
+      "The Mulia","Hard Rock Bali","Kuta Beach Hotel","Samabe Bali"
     ]
   },
+
   dubai:{
     img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
-    desc:"Luxury meets adventure",
+    desc:"Luxury, shopping, and adventure.",
     hotels:[
-      {name:"Atlantis The Palm",img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b"},
-      {name:"Burj Al Arab",img:"https://images.unsplash.com/photo-1584132967334-10e028bd69f7"}
+      "Atlantis The Palm","Burj Al Arab","Jumeirah Beach Hotel",
+      "Rove Downtown","Armani Hotel Dubai","Address Sky View",
+      "Five Palm Jumeirah","Sofitel Dubai","Hilton Dubai","W Dubai"
+    ]
+  },
+
+  paris:{
+    img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+    desc:"Romantic and cultural city.",
+    hotels:[
+      "Ritz Paris","Hotel Regina","Le Meurice",
+      "Hotel Lutetia","Shangri-La Paris","Hotel Crillon",
+      "Pullman Paris","Ibis Paris","Novotel Paris","CitizenM Paris"
     ]
   }
 };
 
-function result(){
+function getResult(){
+
+  if(!answers.weather || !answers.type || !answers.budget){
+    alert("Please answer all questions");
+    return;
+  }
 
   let dest="bali";
-  if(answers.includes("adventure")||answers.includes("high")) dest="dubai";
 
-  document.getElementById("quiz").style.display="none";
-  document.getElementById("result").style.display="block";
+  if(answers.type==="adventure" || answers.budget==="high"){
+    dest="dubai";
+  }
 
-  document.getElementById("destImg").src=data[dest].img;
-  document.getElementById("destName").innerText=dest.toUpperCase();
-  document.getElementById("destDesc").innerText=data[dest].desc;
+  if(answers.weather==="cold"){
+    dest="paris";
+  }
+
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+
+  document.getElementById("img").src=data[dest].img;
+  document.getElementById("title").innerText=dest.toUpperCase();
+  document.getElementById("desc").innerText=data[dest].desc;
 
   let html="";
   data[dest].hotels.forEach(h=>{
     html+=`
     <div class="hotel">
-      <img src="${h.img}">
+      <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945">
       <div class="hotel-info">
-        <h3>${h.name}</h3>
-        <p>Premium stay</p>
-        <button onclick="alert('Booking coming soon')">View deal</button>
+        <h3>${h}</h3>
+        <p>Great location • Highly rated</p>
       </div>
     </div>`;
   });
