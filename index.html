@@ -1,186 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Holiday Finder ✈️</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
-      color: white;
-      text-align: center;
-      padding: 50px;
-    }
-    .box {
-      background: rgba(0,0,0,0.3);
-      padding: 30px;
-      border-radius: 15px;
-      max-width: 600px;
-      margin: auto;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .hidden {
-      display: none;
-    }
-    .hotel {
-      background: rgba(255,255,255,0.2);
-      margin-top: 15px;
-      padding: 15px;
-      border-radius: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Holiday Finder ✈️</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#0f172a;
+  color:white;
+  overflow-x:hidden;
+}
+
+.container {
+  max-width:700px;
+  margin:auto;
+  padding:30px;
+  text-align:center;
+}
+
+.hidden {display:none;}
+
+button {
+  padding:12px 20px;
+  margin:10px;
+  border:none;
+  border-radius:12px;
+  background:#38bdf8;
+  cursor:pointer;
+  font-size:16px;
+}
+
+button:hover {background:#0ea5e9;}
+
+.progress {
+  height:6px;
+  background:#1e293b;
+  margin-bottom:20px;
+}
+
+.bar {
+  height:6px;
+  background:#38bdf8;
+  width:0%;
+  transition:0.3s;
+}
+
+.card {
+  background:#1e293b;
+  padding:15px;
+  margin-top:15px;
+  border-radius:12px;
+}
+
+img {
+  width:100%;
+  border-radius:10px;
+}
+
+.fade {
+  animation:fade 0.4s;
+}
+
+@keyframes fade {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
+}
+</style>
 </head>
+
 <body>
 
-<div class="box" id="quiz">
-  <h1>Find Your Perfect Holiday ✈️</h1>
+<div class="container">
 
-  <p>What weather do you prefer?</p>
-  <button onclick="setAnswer('weather','hot')">Hot ☀️</button>
-  <button onclick="setAnswer('weather','cold')">Cold ❄️</button>
+<h1>Find Your Perfect Holiday ✈️</h1>
 
-  <p>What type of trip?</p>
-  <button onclick="setAnswer('type','relax')">Relax 🏖️</button>
-  <button onclick="setAnswer('type','adventure')">Adventure 🏔️</button>
-  <button onclick="setAnswer('type','city')">City 🏙️</button>
+<div class="progress"><div class="bar" id="bar"></div></div>
 
-  <p>Budget?</p>
-  <button onclick="setAnswer('budget','low')">Low 💸</button>
-  <button onclick="setAnswer('budget','high')">High 💎</button>
-
-  <br><br>
-  <button onclick="getResult()">Find Destination</button>
+<div id="q1" class="fade">
+<h2>What weather do you prefer?</h2>
+<button onclick="next('hot')">Hot ☀️</button>
+<button onclick="next('cold')">Cold ❄️</button>
 </div>
 
-<div class="box hidden" id="result">
-  <h2 id="destination"></h2>
-  <p id="description"></p>
+<div id="q2" class="hidden fade">
+<h2>What type of trip?</h2>
+<button onclick="next('relax')">Relax 🏖️</button>
+<button onclick="next('adventure')">Adventure 🏔️</button>
+<button onclick="next('city')">City 🏙️</button>
+</div>
 
-  <h3>Recommended Hotels 🏨</h3>
-  <div id="hotels"></div>
+<div id="q3" class="hidden fade">
+<h2>What’s your budget?</h2>
+<button onclick="finish('low')">Low 💸</button>
+<button onclick="finish('high')">Luxury 💎</button>
+</div>
 
-  <br>
-  <button onclick="restart()">Start Again</button>
+<div id="result" class="hidden fade">
+<h1 id="title"></h1>
+<img id="img">
+<p id="desc"></p>
+
+<h3>Why this matches you</h3>
+<p id="why"></p>
+
+<h2>Top Hotels</h2>
+<div id="hotels"></div>
+
+<button onclick="restart()">Start Again</button>
+</div>
+
 </div>
 
 <script>
-let answers = {};
 
-function setAnswer(question, value) {
-  answers[question] = value;
+let answers=[];
+let step=1;
+
+function updateBar(){
+  document.getElementById("bar").style.width=(step*33)+"%";
 }
 
-function getResult() {
-  let destination = "";
-  let description = "";
-  let hotels = [];
+function next(a){
+  answers.push(a);
+  document.getElementById("q"+step).classList.add("hidden");
+  step++;
+  document.getElementById("q"+step).classList.remove("hidden");
+  updateBar();
+}
 
-  // LOGIC
-  if (answers.weather === "hot" && answers.type === "relax") {
-    destination = "Bali 🌴";
-    description = "A tropical paradise with beaches and relaxation.";
+function finish(a){
+  answers.push(a);
+  document.getElementById("q3").classList.add("hidden");
+  showResult();
+}
 
-    hotels = [
-      {
-        name: "Four Seasons Resort Bali at Sayan",
-        phone: "+62 361 977577",
-        website: "https://www.fourseasons.com/sayan/"
-      },
-      {
-        name: "The Kayon Resort",
-        phone: "+62 361 4792553",
-        website: "https://thekayonresort.com/"
-      }
-    ];
+const data={
+  bali:{
+    img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    desc:"A tropical paradise for pure relaxation.",
+    why:"You chose warm weather and relaxation — Bali is perfect.",
+    hotels:[
+      {n:"Four Seasons Bali", t:"Luxury 💎", l:"Ubud", link:"https://www.fourseasons.com"},
+      {n:"Bulgari Resort", t:"Luxury 💎", l:"Uluwatu", link:"https://www.bulgarihotels.com"},
+      {n:"Ayodya Resort", t:"Mid-range", l:"Nusa Dua", link:"https://www.ayodyaresortbali.com"}
+    ]
+  },
+
+  paris:{
+    img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+    desc:"Romantic, cultural and iconic.",
+    why:"You prefer culture and cooler vibes — Paris fits perfectly.",
+    hotels:[
+      {n:"Ritz Paris", t:"Luxury 💎", l:"Central", link:"https://www.ritzparis.com"},
+      {n:"Hotel Regina", t:"Premium", l:"Louvre", link:"https://www.regina-hotel.com"},
+      {n:"Ibis Paris", t:"Budget", l:"Various", link:"https://all.accor.com"}
+    ]
+  },
+
+  dubai:{
+    img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
+    desc:"Luxury, shopping and adventure.",
+    why:"You like excitement and luxury — Dubai delivers both.",
+    hotels:[
+      {n:"Atlantis The Palm", t:"Luxury 💎", l:"Palm", link:"https://www.atlantis.com"},
+      {n:"Burj Al Arab", t:"Ultra Luxury", l:"Jumeirah", link:"https://www.jumeirah.com"},
+      {n:"Rove Downtown", t:"Budget", l:"Downtown", link:"https://www.rovehotels.com"}
+    ]
+  },
+
+  barcelona:{
+    img:"https://images.unsplash.com/photo-1505761671935-60b3a7427bad",
+    desc:"A vibrant mix of beach and city life.",
+    why:"You like balance — culture + relaxation — Barcelona is ideal.",
+    hotels:[
+      {n:"W Barcelona", t:"Luxury", l:"Beach", link:"https://www.marriott.com"},
+      {n:"Hotel Arts", t:"Premium", l:"City", link:"https://www.hotelartsbarcelona.com"},
+      {n:"Generator Hostel", t:"Budget", l:"Centre", link:"https://generatorhostels.com"}
+    ]
   }
+};
 
-  else if (answers.type === "city") {
-    destination = "Paris 🗼";
-    description = "A romantic city full of culture and history.";
+function showResult(){
 
-    hotels = [
-      {
-        name: "Hotel Le Meurice",
-        phone: "+33 1 44 58 10 10",
-        website: "https://www.dorchestercollection.com/"
-      },
-      {
-        name: "Hotel Regina Louvre",
-        phone: "+33 1 42 60 31 10",
-        website: "https://www.regina-hotel.com/"
-      }
-    ];
-  }
+  let score={bali:0,paris:0,dubai:0,barcelona:0};
 
-  else if (answers.type === "adventure") {
-    destination = "Dubai 🏜️";
-    description = "Luxury meets adventure in the desert.";
-
-    hotels = [
-      {
-        name: "Atlantis The Palm",
-        phone: "+971 4 426 0000",
-        website: "https://www.atlantis.com/dubai"
-      },
-      {
-        name: "Jumeirah Beach Hotel",
-        phone: "+971 4 348 0000",
-        website: "https://www.jumeirah.com/"
-      }
-    ];
-  }
-
-  else {
-    destination = "Barcelona 🌆";
-    description = "A mix of beach, city, and culture.";
-
-    hotels = [
-      {
-        name: "Hotel Arts Barcelona",
-        phone: "+34 93 221 1000",
-        website: "https://www.hotelartsbarcelona.com/"
-      },
-      {
-        name: "W Barcelona",
-        phone: "+34 93 295 2800",
-        website: "https://www.marriott.com/"
-      }
-    ];
-  }
-
-  // DISPLAY
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("result").classList.remove("hidden");
-
-  document.getElementById("destination").innerText = destination;
-  document.getElementById("description").innerText = description;
-
-  let hotelHTML = "";
-  hotels.forEach(hotel => {
-    hotelHTML += `
-      <div class="hotel">
-        <h4>${hotel.name}</h4>
-        <p>📞 ${hotel.phone}</p>
-        <a href="${hotel.website}" target="_blank">Visit Website</a>
-      </div>
-    `;
+  answers.forEach(a=>{
+    if(a==="hot"){score.bali+=2;score.dubai+=2;}
+    if(a==="cold"){score.paris+=2;}
+    if(a==="relax"){score.bali+=3;}
+    if(a==="adventure"){score.dubai+=3;}
+    if(a==="city"){score.paris+=2;score.barcelona+=2;}
+    if(a==="low"){score.barcelona+=2;}
+    if(a==="high"){score.dubai+=2;}
   });
 
-  document.getElementById("hotels").innerHTML = hotelHTML;
+  let dest=Object.keys(score).reduce((a,b)=>score[a]>score[b]?a:b);
+
+  document.getElementById("result").classList.remove("hidden");
+
+  document.getElementById("title").innerText=dest.toUpperCase();
+  document.getElementById("desc").innerText=data[dest].desc;
+  document.getElementById("why").innerText=data[dest].why;
+  document.getElementById("img").src=data[dest].img;
+
+  let html="";
+  data[dest].hotels.forEach(h=>{
+    html+=`
+    <div class="card">
+      <h3>${h.n}</h3>
+      <p>${h.t}</p>
+      <p>📍 ${h.l}</p>
+      <a href="${h.link}" target="_blank">View Hotel</a>
+    </div>`;
+  });
+
+  document.getElementById("hotels").innerHTML=html;
 }
 
-function restart() {
-  answers = {};
-  document.getElementById("quiz").classList.remove("hidden");
-  document.getElementById("result").classList.add("hidden");
+function restart(){
+  location.reload();
 }
+
+updateBar();
+
 </script>
 
 </body>
