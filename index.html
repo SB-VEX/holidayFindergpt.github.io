@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Holiday Finder</title>
+<title>TravelAI</title>
 
 <style>
 body {
@@ -12,142 +12,116 @@ body {
   color:white;
 }
 
-/* HERO */
-.hero {
-  height:100vh;
-  background:url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e") center/cover;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+.section {
+  display:none;
+  padding:30px;
   text-align:center;
 }
 
-.hero h1 {font-size:48px;}
-.hero button {
-  margin-top:20px;
-  padding:15px 30px;
+.active {display:block;}
+
+button {
+  padding:12px 20px;
+  margin:10px;
   border:none;
-  border-radius:30px;
-  background:white;
-  color:black;
+  border-radius:12px;
+  background:#111;
+  color:white;
   cursor:pointer;
 }
 
-/* QUIZ */
-.quiz, .result, .hotel-page {
-  display:none;
-  padding:40px;
-  text-align:center;
-}
-
-button.option {
-  display:block;
-  width:100%;
-  max-width:400px;
-  margin:10px auto;
-  padding:15px;
-  border-radius:12px;
-  border:none;
-  background:#111;
-  color:white;
-}
-
-button.option.selected {
+button.selected {
   background:white;
   color:black;
 }
 
-/* HOTEL LIST */
-.hotel {
-  display:flex;
-  margin-top:15px;
+.cta {
+  background:linear-gradient(135deg,#38bdf8,#6366f1);
+}
+
+.card {
   background:#111;
+  margin:15px 0;
   border-radius:15px;
   overflow:hidden;
   cursor:pointer;
 }
 
-.hotel img {
-  width:120px;
+.card img {
+  width:100%;
+  height:200px;
   object-fit:cover;
 }
 
-.hotel-info {
+.card-content {
   padding:10px;
-  text-align:left;
 }
-
-/* HOTEL DETAIL */
-.hotel-page img {
-  width:100%;
-  border-radius:20px;
-}
-
-.hidden {display:none;}
 </style>
 </head>
 
 <body>
 
-<!-- HERO -->
-<div class="hero" id="home">
-  <h1>Find your perfect holiday</h1>
-  <button onclick="start()">Start</button>
+<!-- HOME -->
+<div id="home" class="section active">
+<h1>TravelAI ✈️</h1>
+<p>Find, plan, and book your perfect trip</p>
+<button class="cta" onclick="go('quiz')">Start</button>
 </div>
 
 <!-- QUIZ -->
-<div class="quiz" id="quiz">
+<div id="quiz" class="section">
 
-<h2>Weather?</h2>
-<button class="option" onclick="select('weather','hot',this)">Hot</button>
-<button class="option" onclick="select('weather','cold',this)">Cold</button>
+<h2>Weather</h2>
+<button onclick="select('weather','hot',this)">Hot</button>
+<button onclick="select('weather','cold',this)">Cold</button>
 
-<h2>Trip type?</h2>
-<button class="option" onclick="select('type','relax',this)">Relax</button>
-<button class="option" onclick="select('type','adventure',this)">Adventure</button>
-<button class="option" onclick="select('type','city',this)">City</button>
+<h2>Trip Type</h2>
+<button onclick="select('type','relax',this)">Relax</button>
+<button onclick="select('type','adventure',this)">Adventure</button>
+<button onclick="select('type','city',this)">City</button>
 
-<h2>Budget?</h2>
-<button class="option" onclick="select('budget','low',this)">Low</button>
-<button class="option" onclick="select('budget','high',this)">Luxury</button>
+<h2>Budget</h2>
+<button onclick="select('budget','low',this)">Budget</button>
+<button onclick="select('budget','high',this)">Luxury</button>
 
-<h2>Travel with?</h2>
-<button class="option" onclick="select('group','solo',this)">Solo</button>
-<button class="option" onclick="select('group','couple',this)">Couple</button>
-<button class="option" onclick="select('group','family',this)">Family</button>
-
-<button onclick="getResult()">Find Trip</button>
-
+<button class="cta" onclick="getResult()">Find Trip</button>
 </div>
 
-<!-- RESULTS -->
-<div class="result" id="result">
+<!-- RESULT -->
+<div id="result" class="section">
 <h1 id="destName"></h1>
 <p id="destDesc"></p>
 
 <h2>Top Hotels</h2>
 <div id="hotelList"></div>
 
-<button onclick="location.reload()">Start Again</button>
+<button onclick="generatePlan()">✨ Generate Itinerary</button>
 </div>
 
-<!-- HOTEL DETAIL -->
-<div class="hotel-page" id="hotelPage">
-<img id="hotelImg">
+<!-- HOTEL PAGE -->
+<div id="hotelPage" class="section">
+<img id="hotelImg" style="width:100%">
 <h1 id="hotelName"></h1>
-<p id="hotelDesc"></p>
-<p id="hotelPrice"></p>
-<button onclick="back()">Back</button>
+<p id="hotelInfo"></p>
+<button class="cta">Book Now</button>
+<button onclick="go('result')">Back</button>
+</div>
+
+<!-- ITINERARY -->
+<div id="plan" class="section">
+<h1>Your 3-Day Plan</h1>
+<div id="planContent"></div>
+<button onclick="go('result')">Back</button>
 </div>
 
 <script>
 
 let answers={};
+let currentDest="";
 
-function start(){
-  home.style.display="none";
-  quiz.style.display="block";
+function go(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
 function select(cat,val,btn){
@@ -158,62 +132,38 @@ function select(cat,val,btn){
 }
 
 const data={
-  dubai:{
-    desc:"Luxury and adventure",
+  bali:{
+    desc:"Relax in paradise",
     hotels:[
-      {
-        name:"Atlantis The Palm",
-        img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
-        desc:"Iconic luxury resort with waterpark",
-        price:"£400/night"
-      },
-      {
-        name:"Burj Al Arab",
-        img:"https://images.unsplash.com/photo-1584132967334-10e028bd69f7",
-        desc:"World-famous 7-star hotel",
-        price:"£1000/night"
-      }
+      {name:"Four Seasons Bali",img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"},
+      {name:"Bulgari Resort",img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"}
     ]
   },
-
-  bali:{
-    desc:"Relaxing tropical paradise",
+  dubai:{
+    desc:"Luxury + adventure",
     hotels:[
-      {
-        name:"Four Seasons Bali",
-        img:"https://images.unsplash.com/photo-1566073771259-6a8506099945",
-        desc:"Private villas in jungle setting",
-        price:"£500/night"
-      },
-      {
-        name:"Bulgari Resort",
-        img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
-        desc:"Luxury cliffside villas",
-        price:"£800/night"
-      }
+      {name:"Atlantis The Palm",img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b"},
+      {name:"Burj Al Arab",img:"https://images.unsplash.com/photo-1584132967334-10e028bd69f7"}
     ]
   }
 };
 
 function getResult(){
+  currentDest="bali";
+  if(answers.type==="adventure"||answers.budget==="high") currentDest="dubai";
 
-  let dest="bali";
-  if(answers.type==="adventure" || answers.budget==="high") dest="dubai";
+  go("result");
 
-  quiz.style.display="none";
-  result.style.display="block";
-
-  destName.innerText=dest.toUpperCase();
-  destDesc.innerText=data[dest].desc;
+  destName.innerText=currentDest.toUpperCase();
+  destDesc.innerText=data[currentDest].desc;
 
   let html="";
-  data[dest].hotels.forEach((h,i)=>{
+  data[currentDest].hotels.forEach((h,i)=>{
     html+=`
-    <div class="hotel" onclick="openHotel('${dest}',${i})">
+    <div class="card" onclick="openHotel(${i})">
       <img src="${h.img}">
-      <div class="hotel-info">
+      <div class="card-content">
         <h3>${h.name}</h3>
-        <p>${h.price}</p>
       </div>
     </div>`;
   });
@@ -221,21 +171,24 @@ function getResult(){
   hotelList.innerHTML=html;
 }
 
-function openHotel(dest,i){
-  let h=data[dest].hotels[i];
+function openHotel(i){
+  let h=data[currentDest].hotels[i];
 
-  result.style.display="none";
-  hotelPage.style.display="block";
+  go("hotelPage");
 
   hotelImg.src=h.img;
   hotelName.innerText=h.name;
-  hotelDesc.innerText=h.desc;
-  hotelPrice.innerText=h.price;
+  hotelInfo.innerText="Luxury stay • Great reviews";
 }
 
-function back(){
-  hotelPage.style.display="none";
-  result.style.display="block";
+function generatePlan(){
+  go("plan");
+
+  planContent.innerHTML=`
+  <p>Day 1: Arrival + explore city</p>
+  <p>Day 2: Main attractions</p>
+  <p>Day 3: Relax + departure</p>
+  `;
 }
 
 </script>
