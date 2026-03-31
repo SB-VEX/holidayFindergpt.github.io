@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Holiday Finder ✈️</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+    .box {
+      background: rgba(0,0,0,0.3);
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 600px;
+      margin: auto;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .hidden {
+      display: none;
+    }
+    .hotel {
+      background: rgba(255,255,255,0.2);
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box" id="quiz">
+  <h1>Find Your Perfect Holiday ✈️</h1>
+
+  <p>What weather do you prefer?</p>
+  <button onclick="setAnswer('weather','hot')">Hot ☀️</button>
+  <button onclick="setAnswer('weather','cold')">Cold ❄️</button>
+
+  <p>What type of trip?</p>
+  <button onclick="setAnswer('type','relax')">Relax 🏖️</button>
+  <button onclick="setAnswer('type','adventure')">Adventure 🏔️</button>
+  <button onclick="setAnswer('type','city')">City 🏙️</button>
+
+  <p>Budget?</p>
+  <button onclick="setAnswer('budget','low')">Low 💸</button>
+  <button onclick="setAnswer('budget','high')">High 💎</button>
+
+  <br><br>
+  <button onclick="getResult()">Find Destination</button>
+</div>
+
+<div class="box hidden" id="result">
+  <h2 id="destination"></h2>
+  <p id="description"></p>
+
+  <h3>Recommended Hotels 🏨</h3>
+  <div id="hotels"></div>
+
+  <br>
+  <button onclick="restart()">Start Again</button>
+</div>
+
+<script>
+let answers = {};
+
+function setAnswer(question, value) {
+  answers[question] = value;
+}
+
+function getResult() {
+  let destination = "";
+  let description = "";
+  let hotels = [];
+
+  // LOGIC
+  if (answers.weather === "hot" && answers.type === "relax") {
+    destination = "Bali 🌴";
+    description = "A tropical paradise with beaches and relaxation.";
+
+    hotels = [
+      {
+        name: "Four Seasons Resort Bali at Sayan",
+        phone: "+62 361 977577",
+        website: "https://www.fourseasons.com/sayan/"
+      },
+      {
+        name: "The Kayon Resort",
+        phone: "+62 361 4792553",
+        website: "https://thekayonresort.com/"
+      }
+    ];
+  }
+
+  else if (answers.type === "city") {
+    destination = "Paris 🗼";
+    description = "A romantic city full of culture and history.";
+
+    hotels = [
+      {
+        name: "Hotel Le Meurice",
+        phone: "+33 1 44 58 10 10",
+        website: "https://www.dorchestercollection.com/"
+      },
+      {
+        name: "Hotel Regina Louvre",
+        phone: "+33 1 42 60 31 10",
+        website: "https://www.regina-hotel.com/"
+      }
+    ];
+  }
+
+  else if (answers.type === "adventure") {
+    destination = "Dubai 🏜️";
+    description = "Luxury meets adventure in the desert.";
+
+    hotels = [
+      {
+        name: "Atlantis The Palm",
+        phone: "+971 4 426 0000",
+        website: "https://www.atlantis.com/dubai"
+      },
+      {
+        name: "Jumeirah Beach Hotel",
+        phone: "+971 4 348 0000",
+        website: "https://www.jumeirah.com/"
+      }
+    ];
+  }
+
+  else {
+    destination = "Barcelona 🌆";
+    description = "A mix of beach, city, and culture.";
+
+    hotels = [
+      {
+        name: "Hotel Arts Barcelona",
+        phone: "+34 93 221 1000",
+        website: "https://www.hotelartsbarcelona.com/"
+      },
+      {
+        name: "W Barcelona",
+        phone: "+34 93 295 2800",
+        website: "https://www.marriott.com/"
+      }
+    ];
+  }
+
+  // DISPLAY
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+
+  document.getElementById("destination").innerText = destination;
+  document.getElementById("description").innerText = description;
+
+  let hotelHTML = "";
+  hotels.forEach(hotel => {
+    hotelHTML += `
+      <div class="hotel">
+        <h4>${hotel.name}</h4>
+        <p>📞 ${hotel.phone}</p>
+        <a href="${hotel.website}" target="_blank">Visit Website</a>
+      </div>
+    `;
+  });
+
+  document.getElementById("hotels").innerHTML = hotelHTML;
+}
+
+function restart() {
+  answers = {};
+  document.getElementById("quiz").classList.remove("hidden");
+  document.getElementById("result").classList.add("hidden");
+}
+</script>
+
+</body>
+</html>
