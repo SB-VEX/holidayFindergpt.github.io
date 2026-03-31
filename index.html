@@ -2,220 +2,228 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Holiday Finder ✈️</title>
+<title>Holiday Finder</title>
 
 <style>
+* {margin:0; padding:0; box-sizing:border-box;}
 body {
-  margin:0;
-  font-family: Arial;
-  background:#0f172a;
-  color:white;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #000;
+  color: white;
 }
 
-.container {
-  max-width:800px;
-  margin:auto;
-  padding:30px;
+/* HERO */
+.hero {
+  height:100vh;
+  background:url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e") center/cover;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
   text-align:center;
 }
 
-button {
-  padding:12px 20px;
-  margin:10px;
+.hero h1 {
+  font-size:48px;
+  font-weight:600;
+}
+
+.hero p {
+  margin-top:10px;
+  opacity:0.8;
+}
+
+.hero button {
+  margin-top:20px;
+  padding:15px 30px;
   border:none;
+  border-radius:30px;
+  background:white;
+  color:black;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* GLASS CARD */
+.glass {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.1);
+  border-radius:20px;
+  padding:30px;
+  max-width:600px;
+  margin:auto;
+}
+
+/* QUIZ */
+.quiz {
+  display:none;
+  padding:60px 20px;
+  text-align:center;
+}
+
+button.option {
+  display:block;
+  width:100%;
+  margin:10px 0;
+  padding:15px;
   border-radius:12px;
-  background:#1e293b;
+  border:none;
+  background: rgba(255,255,255,0.1);
   color:white;
   cursor:pointer;
 }
 
-button.selected {
-  background:#38bdf8;
+button.option.selected {
+  background:white;
   color:black;
 }
 
-button:hover {
-  background:#0ea5e9;
+/* RESULT */
+.result {
+  display:none;
+  padding:40px 20px;
 }
 
-.hidden {display:none;}
-
-.card {
-  background:#1e293b;
-  padding:15px;
-  margin-top:15px;
-  border-radius:12px;
-}
-
-img {
+.dest-img {
   width:100%;
-  border-radius:12px;
-  margin-top:10px;
+  border-radius:20px;
 }
 
-.cta {
-  background:#22c55e;
-  color:black;
+.hotel {
+  display:flex;
+  margin-top:15px;
+  background:#111;
+  border-radius:15px;
+  overflow:hidden;
 }
 
-input {
+.hotel img {
+  width:120px;
+  object-fit:cover;
+}
+
+.hotel-info {
   padding:10px;
-  border-radius:8px;
-  border:none;
-  width:60%;
 }
 
-.price {
-  color:#22c55e;
+.hotel-info h3 {
+  font-size:16px;
+}
+
+.hotel-info p {
+  font-size:13px;
+  opacity:0.7;
+}
+
+.hotel-info button {
+  margin-top:5px;
+  padding:8px 12px;
+  border:none;
+  border-radius:10px;
+  background:white;
+  color:black;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<h1>Find Your Perfect Holiday ✈️</h1>
-
-<div id="quiz">
-
-<p>Weather?</p>
-<button onclick="select(this,'hot')">Hot ☀️</button>
-<button onclick="select(this,'cold')">Cold ❄️</button>
-
-<p>Trip type?</p>
-<button onclick="select(this,'relax')">Relax 🏖️</button>
-<button onclick="select(this,'adventure')">Adventure 🏔️</button>
-<button onclick="select(this,'city')">City 🏙️</button>
-
-<p>Budget?</p>
-<button onclick="select(this,'low')">Low 💸</button>
-<button onclick="select(this,'high')">Luxury 💎</button>
-
-<br><br>
-<button onclick="getResult()">Find My Trip</button>
-
+<!-- HERO -->
+<div class="hero" id="hero">
+  <h1>Find your perfect holiday</h1>
+  <p>Personalised in 30 seconds</p>
+  <button onclick="start()">Start</button>
 </div>
 
-<div id="result" class="hidden">
+<!-- QUIZ -->
+<div class="quiz" id="quiz">
+  <div class="glass">
+    <h2>Choose your vibe</h2>
 
-<h1 id="title"></h1>
-<img id="image">
-<p id="desc"></p>
-<p id="why"></p>
+    <button class="option" onclick="select(this,'hot')">Hot ☀️</button>
+    <button class="option" onclick="select(this,'cold')">Cold ❄️</button>
 
-<p class="price" id="price"></p>
+    <button class="option" onclick="select(this,'relax')">Relax 🏖️</button>
+    <button class="option" onclick="select(this,'adventure')">Adventure 🏔️</button>
+    <button class="option" onclick="select(this,'city')">City 🏙️</button>
 
-<p style="color:#22c55e;">🔥 Popular choice right now</p>
+    <button class="option" onclick="select(this,'low')">Budget 💸</button>
+    <button class="option" onclick="select(this,'high')">Luxury 💎</button>
 
-<h2>Top Hotels</h2>
-<div id="hotels"></div>
-
-<h3>Get your personalised 5-day travel plan ✈️</h3>
-<input id="email" placeholder="Enter your email">
-<br>
-<button class="cta" onclick="captureEmail()">Send My Plan</button>
-
-<br><br>
-<button onclick="restart()">Start Again</button>
-
+    <button onclick="result()">Find my trip</button>
+  </div>
 </div>
 
+<!-- RESULT -->
+<div class="result" id="result">
+  <img id="destImg" class="dest-img">
+  <h1 id="destName"></h1>
+  <p id="destDesc"></p>
+
+  <h2>Top stays</h2>
+  <div id="hotels"></div>
 </div>
 
 <script>
 
-let answers = [];
+let answers=[];
 
-function select(btn, value){
-  btn.classList.toggle("selected");
-  answers.push(value);
+function start(){
+  document.getElementById("hero").style.display="none";
+  document.getElementById("quiz").style.display="block";
 }
 
-const data = {
+function select(btn,val){
+  btn.classList.toggle("selected");
+  answers.push(val);
+}
 
+const data={
   bali:{
     img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-    desc:"Relax in a tropical paradise.",
-    why:"Perfect for your warm + relaxation preferences.",
-    price:"Trips from £600",
+    desc:"Tropical paradise perfect for relaxation",
     hotels:[
-      {n:"Four Seasons Bali", link:"https://www.booking.com"},
-      {n:"Bulgari Resort", link:"https://www.booking.com"},
-      {n:"Ayodya Resort", link:"https://www.booking.com"}
+      {name:"Four Seasons Bali",img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"},
+      {name:"Bulgari Resort",img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"}
     ]
   },
-
   dubai:{
     img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
-    desc:"Luxury and adventure combined.",
-    why:"Matches your high-energy + luxury vibe.",
-    price:"Trips from £800",
+    desc:"Luxury meets adventure",
     hotels:[
-      {n:"Atlantis The Palm", link:"https://www.booking.com"},
-      {n:"Burj Al Arab", link:"https://www.booking.com"},
-      {n:"Rove Downtown", link:"https://www.booking.com"}
-    ]
-  },
-
-  paris:{
-    img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
-    desc:"Romantic cultural escape.",
-    why:"Ideal for city lovers.",
-    price:"Trips from £500",
-    hotels:[
-      {n:"Ritz Paris", link:"https://www.booking.com"},
-      {n:"Hotel Regina", link:"https://www.booking.com"}
+      {name:"Atlantis The Palm",img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b"},
+      {name:"Burj Al Arab",img:"https://images.unsplash.com/photo-1584132967334-10e028bd69f7"}
     ]
   }
-
 };
 
-function getResult(){
+function result(){
 
-  let score={bali:0,dubai:0,paris:0};
+  let dest="bali";
+  if(answers.includes("adventure")||answers.includes("high")) dest="dubai";
 
-  answers.forEach(a=>{
-    if(a==="hot"){score.bali+=2;score.dubai+=2;}
-    if(a==="cold"){score.paris+=2;}
-    if(a==="relax"){score.bali+=3;}
-    if(a==="adventure"){score.dubai+=3;}
-    if(a==="city"){score.paris+=2;}
-    if(a==="high"){score.dubai+=2;}
-  });
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("result").style.display="block";
 
-  let dest=Object.keys(score).reduce((a,b)=>score[a]>score[b]?a:b);
-
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("result").classList.remove("hidden");
-
-  document.getElementById("title").innerText=dest.toUpperCase();
-  document.getElementById("desc").innerText=data[dest].desc;
-  document.getElementById("why").innerText=data[dest].why;
-  document.getElementById("price").innerText=data[dest].price;
-  document.getElementById("image").src=data[dest].img;
+  document.getElementById("destImg").src=data[dest].img;
+  document.getElementById("destName").innerText=dest.toUpperCase();
+  document.getElementById("destDesc").innerText=data[dest].desc;
 
   let html="";
   data[dest].hotels.forEach(h=>{
     html+=`
-    <div class="card">
-      <h3>${h.n}</h3>
-      <button class="cta" onclick="window.open('${h.link}')">Book Best Price</button>
+    <div class="hotel">
+      <img src="${h.img}">
+      <div class="hotel-info">
+        <h3>${h.name}</h3>
+        <p>Premium stay</p>
+        <button onclick="alert('Booking coming soon')">View deal</button>
+      </div>
     </div>`;
   });
 
   document.getElementById("hotels").innerHTML=html;
-}
-
-function captureEmail(){
-  let email=document.getElementById("email").value;
-  if(email){
-    alert("Your personalised plan is on its way to "+email);
-  }
-}
-
-function restart(){
-  location.reload();
 }
 
 </script>
